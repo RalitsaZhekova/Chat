@@ -68,6 +68,7 @@ public class UserRepository {
                 .join(User.TABLE_NAME + " u", "f." + Friend.columns.USER_ID_2 + " = u." + User.columns.ID)
                 .where("f." + Friend.columns.USER_ID_1, userId)
                 .andWhere("u." + User.columns.IS_ACTIVE, 1)
+                .andWhere("f." + Friend.columns.IS_ACTIVE, 1)
                 .limit(limit)
                 .offset(offset)
                 .fetchAll(new UserRowMapper());
@@ -79,6 +80,7 @@ public class UserRepository {
                 .join(User.TABLE_NAME + " u", "f." + Friend.columns.USER_ID_2 + " = u." + User.columns.ID)
                 .where("f." + Friend.columns.USER_ID_1, userId)
                 .andWhere("u." + User.columns.IS_ACTIVE, 1)
+                .andWhere("f." + Friend.columns.IS_ACTIVE, 1)
                 .fetchAll(new UserRowMapper());
     }
 
