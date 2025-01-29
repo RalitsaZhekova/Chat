@@ -45,4 +45,12 @@ public class WhereQueryBuilder<T> {
         return this.orWhere(colName, "=", value);
     }
 
+    public T rawWhere(String condition, Object... values) {
+        this.queryProcessor.getSqlQuery().append(" WHERE ").append(condition);
+        for (Object value : values) {
+            this.queryProcessor.setQueryColValue("", value);
+        }
+        return (T) this;
+    }
+
 }

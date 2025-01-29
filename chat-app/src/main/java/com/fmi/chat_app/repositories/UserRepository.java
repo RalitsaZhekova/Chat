@@ -63,24 +63,26 @@ public class UserRepository {
     }
 
     public List<User> fetchUserFriends(int userId, int limit, int offset) {
-        return db.selectAll()
-                .from(Friend.TABLE_NAME + " f")
-                .join(User.TABLE_NAME + " u", "f." + Friend.columns.USER_ID_2 + " = u." + User.columns.ID)
-                .where("f." + Friend.columns.USER_ID_1, userId)
+        return db.select("u.*")
+                .from(User.TABLE_NAME + " u")
+                .rawWhere("u.id IN (SELECT CASE " +
+                        "WHEN f.user_id_1 = ? THEN f.user_id_2 " +
+                        "WHEN f.user_id_2 = ? THEN f.user_id_1 END " +
+                        "FROM td_friends f WHERE f.is_active = 1)", userId, userId)
                 .andWhere("u." + User.columns.IS_ACTIVE, 1)
-                .andWhere("f." + Friend.columns.IS_ACTIVE, 1)
                 .limit(limit)
                 .offset(offset)
                 .fetchAll(new UserRowMapper());
     }
 
     public List<User> countUserFriends(int userId) {
-        return db.selectAll()
-                .from(Friend.TABLE_NAME + " f")
-                .join(User.TABLE_NAME + " u", "f." + Friend.columns.USER_ID_2 + " = u." + User.columns.ID)
-                .where("f." + Friend.columns.USER_ID_1, userId)
+        return db.select("u.*")
+                .from(User.TABLE_NAME + " u")
+                .rawWhere("u.id IN (SELECT CASE " +
+                        "WHEN f.user_id_1 = ? THEN f.user_id_2 " +
+                        "WHEN f.user_id_2 = ? THEN f.user_id_1 END " +
+                        "FROM td_friends f WHERE f.is_active = 1)", userId, userId)
                 .andWhere("u." + User.columns.IS_ACTIVE, 1)
-                .andWhere("f." + Friend.columns.IS_ACTIVE, 1)
                 .fetchAll(new UserRowMapper());
     }
 
