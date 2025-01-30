@@ -77,12 +77,49 @@ public class ChannelRepository {
                 .update() > 0;
     }
 
+    public boolean promoteToAdmin(int channelId, int ownerId, int userId) {
+        if (!isOwner(channelId, ownerId)) {
+            return false;
+        }
+
+        return db.updateTable(ChannelMember.TABLE_NAME)
+                .set(ChannelMember.columns.ROLE, "ADMIN")
+                .where(ChannelMember.columns.CHANNEL_ID, channelId)
+                .andWhere(ChannelMember.columns.USER_ID, userId)
+                .andWhere(ChannelMember.columns.IS_ACTIVE, 1)
+                .update() > 0;
+    }
+
+    public boolean renameChannel(int channelId, int userId, String newName) {
+        if (!isOwnerOrAdmin(channelId, userId)) {
+            return false;
+        }
+
+        return db.updateTable(Channel.TABLE_NAME)
+                .set(Channel.columns.NAME, newName)
+                .where(Channel.columns.ID, channelId)
+                .andWhere(Channel.columns.IS_ACTIVE, 1)
+                .update() > 0;
+    }
+
     public boolean isOwnerOrAdmin(int channelId, int userId) {
         String sql = """
         SELECT COUNT(*)
         FROM tc_channel_members
         WHERE channel_id = ? AND user_id = ? AND is_active = 1
           AND (role = 'OWNER' OR role = 'ADMIN')
+    """.toString();
+
+        int count = jdbcTemplate.queryForObject(sql, Integer.class, channelId, userId);
+        return count > 0;
+    }
+
+    public boolean isOwner(int channelId, int userId) {
+        String sql = """
+        SELECT COUNT(*)
+        FROM tc_channel_members
+        WHERE channel_id = ? AND user_id = ? AND is_active = 1
+          AND role = 'OWNER'
     """.toString();
 
         int count = jdbcTemplate.queryForObject(sql, Integer.class, channelId, userId);

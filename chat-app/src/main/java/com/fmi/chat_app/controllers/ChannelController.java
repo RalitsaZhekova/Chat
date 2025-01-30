@@ -47,7 +47,7 @@ public class ChannelController {
             @PathVariable int channelId,
             @RequestParam int ownerId
     ) {
-        boolean isOwner = channelService.isOwnerOrAdmin(channelId, ownerId);
+        boolean isOwner = channelService.isOwner(channelId, ownerId);
         if (!isOwner) {
             return AppResponse.error()
                     .withCode(HttpStatus.FORBIDDEN)
@@ -67,7 +67,7 @@ public class ChannelController {
                 .build();
     }
 
-    @GetMapping("channels/of_user/{userId}")
+    @GetMapping("/channels/of_user/{userId}")
     public ResponseEntity<?> fetchUserChannels(@PathVariable int userId) {
         List<Channel> channels = channelService.fetchUserChannels(userId);
 
@@ -83,7 +83,7 @@ public class ChannelController {
                 .build();
     }
 
-    @PostMapping("channels/{channelId}/members/add")
+    @PostMapping("/channels/{channelId}/members/add")
     public ResponseEntity<?> addUserToChannel(
             @PathVariable int channelId,
             @RequestParam int requestingUserId,
@@ -116,7 +116,7 @@ public class ChannelController {
                 .build();
     }
 
-    @DeleteMapping("channels/{channelId}/members/remove")
+    @DeleteMapping("/channels/{channelId}/members/remove")
     public ResponseEntity<?> removeUserFromChannel(
             @PathVariable int channelId,
             @RequestParam int requestingUserId,
@@ -145,6 +145,42 @@ public class ChannelController {
         return AppResponse.error()
                 .withCode(HttpStatus.INTERNAL_SERVER_ERROR)
                 .withMessage("Failed to remove user from the channel.")
+                .build();
+    }
+
+    @PutMapping("/channels/{channelId}/promote/{targetUserId}")
+    public ResponseEntity<?> promoteUserToAdmin(
+            @PathVariable int channelId,
+            @RequestParam int requestingUserId,
+            @PathVariable int targetUserId) {
+
+        if (!channelService.promoteUserToAdmin(channelId, requestingUserId, targetUserId)) {
+            return AppResponse.error()
+                    .withCode(HttpStatus.FORBIDDEN)
+                    .withMessage("Only the channel owner can promote users.")
+                    .build();
+        }
+
+        return AppResponse.success()
+                .withMessage("User promoted to Admin successfully.")
+                .build();
+    }
+
+    @PutMapping("/channels/{channelId}/rename")
+    public ResponseEntity<?> renameChannel(
+            @PathVariable int channelId,
+            @RequestParam int userId,
+            @RequestParam String newName) {
+
+        if (!channelService.renameChannel(channelId, userId, newName)) {
+            return AppResponse.error()
+                    .withCode(HttpStatus.FORBIDDEN)
+                    .withMessage("Only Admins or Owners can rename the channel.")
+                    .build();
+        }
+
+        return AppResponse.success()
+                .withMessage("Channel renamed successfully.")
                 .build();
     }
 

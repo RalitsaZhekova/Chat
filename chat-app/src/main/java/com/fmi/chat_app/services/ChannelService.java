@@ -35,8 +35,20 @@ public class ChannelService {
         return channelRepository.removeUserFromChannel(channelId, userId);
     }
 
+    public boolean promoteUserToAdmin(int channelId, int ownerId, int userId) {
+        return channelRepository.promoteToAdmin(channelId, ownerId, userId);
+    }
+
+    public boolean renameChannel(int channelId, int userId, String newName) {
+        return channelRepository.renameChannel(channelId, userId, newName);
+    }
+
     public boolean isOwnerOrAdmin(int channelId, int userId) {
         return channelRepository.isOwnerOrAdmin(channelId, userId);
+    }
+
+    public boolean isOwner(int channelId, int userId) {
+        return channelRepository.isOwner(channelId, userId);
     }
 
     public boolean isUserInChannel(int channelId, int userId) {
