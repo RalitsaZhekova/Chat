@@ -81,4 +81,13 @@ public class SelectQueryBuilder<T>  extends WhereQueryBuilder<SelectQueryBuilder
         return this;
 
     }
+
+    public SelectQueryBuilder<T> orderBy(String column, String direction) {
+        this.queryProcessor.getSqlQuery()
+                .append(" ORDER BY ")
+                .append(column)
+                .append(" ")
+                .append(direction);
+        return this;
+    }
 }
