@@ -4,36 +4,47 @@ import FriendSettings from "./FriendSettings";
 import ChannelSettings from "./ChannelSettings";
 import AddUserForm from "./AddUserForm";
 
-const Sidebar = ({ currentUser, setCurrentUser, setSelectedChat, setChatType }) => {
+const Sidebar = ({ currentUser, setCurrentUser, selectedChat, setSelectedChat, setChatType, chatType }) => {
   const [channels, setChannels] = useState([]);
   const [friends, setFriends] = useState([]);
   const [newChannelName, setNewChannelName] = useState("");
   const [isFriendSettingsOpen, setIsFriendSettingsOpen] = useState(false);
   const [isChannelSettingsOpen, setIsChannelSettingsOpen] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 3;
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     if (currentUser) {
       fetchChannels();
-      fetchFriends();
+      fetchFriends(currentPage);
     }
-  }, [currentUser]);
+  }, [currentUser, currentPage]);
 
   const fetchChannels = async () => {
+    if (!currentUser) {
+      setChannels([]);
+      return;
+    }
+
     try {
       const res = await axios.get(`http://localhost:8081/channels/of_user/${currentUser}`);
-      setChannels(Array.isArray(res.data.data) ? res.data.data : []);
+      setChannels(res.data.data || []);
     } catch (error) {
       console.error("Error fetching channels:", error);
+      setChannels([]);
     }
   };
 
-  const fetchFriends = async (page = 1, rowsPerPage = 10) => {
+  const fetchFriends = async (page = 1) => {
     try {
       const res = await axios.get(
         `http://localhost:8081/users/${currentUser}/friends?page=${page}&rowsPerPage=${rowsPerPage}`
       );
-      setFriends(Array.isArray(res.data.friends) ? res.data.friends : []);
+      setFriends(res.data.friends || []);
+      setTotalPages(res.data.pagination.totalPages || 1);
     } catch (error) {
       console.error("Error fetching friends:", error);
     }
@@ -81,8 +92,13 @@ const Sidebar = ({ currentUser, setCurrentUser, setSelectedChat, setChatType }) 
       {channels.map((ch) => (
         <div 
           key={ch.id} 
-          className="p-2 border cursor-pointer hover:bg-gray-700 rounded" 
-          onClick={() => { setSelectedChat(ch.id); setChatType("channel") }}
+          className={`p-2 border cursor-pointer rounded transition ${
+            selectedChat === ch.id && chatType === "channel" ? "bg-blue-600" : "hover:bg-gray-700"
+          }`}
+          onClick={() => { 
+            setSelectedChat(ch.id); 
+            setChatType("channel"); 
+          }}
         >
           {ch.name}
         </div>
@@ -99,12 +115,35 @@ const Sidebar = ({ currentUser, setCurrentUser, setSelectedChat, setChatType }) 
       {friends.map((fr) => (
         <div 
           key={fr.id} 
-          className="p-2 border cursor-pointer hover:bg-gray-700 rounded" 
-          onClick={() => { setSelectedChat(fr.id); setChatType("friend") }}
+          className={`p-2 border cursor-pointer rounded transition ${
+            selectedChat === fr.id && chatType === "friend" ? "bg-green-600" : "hover:bg-gray-700"
+          }`}
+          onClick={() => { 
+            setSelectedChat(fr.id); 
+            setChatType("friend"); 
+          }}
         >
           {fr.name}
         </div>
       ))}
+
+      <div className="flex justify-between mt-2">
+        <button 
+          className={`p-2 ${currentPage > 1 ? "bg-gray-500 hover:bg-gray-600" : "bg-gray-700 cursor-not-allowed"} text-white rounded`} 
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+        >
+          Prev
+        </button>
+        <span className="text-gray-300 p-2">Page {currentPage} of {totalPages}</span>
+        <button 
+          className={`p-2 ${currentPage < totalPages ? "bg-gray-500 hover:bg-gray-600" : "bg-gray-700 cursor-not-allowed"} text-white rounded`} 
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+        >
+          Next
+        </button>
+      </div>
 
       <button 
         className="w-full p-2 mt-4 bg-green-500 text-white rounded hover:bg-green-600 transition"
@@ -124,7 +163,7 @@ const Sidebar = ({ currentUser, setCurrentUser, setSelectedChat, setChatType }) 
         <FriendSettings 
           currentUser={currentUser} 
           closeSettings={() => setIsFriendSettingsOpen(false)} 
-          refreshFriends={fetchFriends} 
+          refreshFriends={() => fetchFriends(currentPage)} 
         />
       )}
       {isChannelSettingsOpen && (

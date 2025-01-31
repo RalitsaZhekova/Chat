@@ -80,12 +80,12 @@ const ChannelSettings = ({ currentUser, closeSettings, refreshChannels }) => {
   };
 
   const promoteMember = async (userId, userName) => {
-    const confirm = window.confirm(`Are you sure you want to promote ${userName} to Admin?`);
+    const confirm = window.confirm(`Are you sure you want to promote this user to Admin?`);
     if (!confirm) return;
 
     try {
       await axios.put(`http://localhost:8081/channels/${selectedChannel}/promote/${userId}?requestingUserId=${currentUser}`);
-      alert(`${userName} has been promoted to Admin.`);
+      alert(`User has been promoted to Admin.`);
       fetchChannelMembers();
     } catch (error) {
       if (error.response?.status === 403) setErrorMessage("You don't have permission to promote members.");

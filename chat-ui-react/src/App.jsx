@@ -9,7 +9,7 @@ const App = () => {
 
   return (
     <div className="flex h-screen">
-      <Sidebar currentUser={currentUser} setCurrentUser={setCurrentUser} setSelectedChat={setSelectedChat} setChatType={setChatType} />
+      <Sidebar currentUser={currentUser} setCurrentUser={setCurrentUser} selectedChat={selectedChat} setSelectedChat={setSelectedChat} chatType={chatType} setChatType={setChatType} />
       <ChatWindow currentUser={currentUser} selectedChat={selectedChat} chatType={chatType} />
     </div>
   );
