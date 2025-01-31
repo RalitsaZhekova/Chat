@@ -1,6 +1,5 @@
 package com.fmi.chat_app.repositories;
 
-import com.fmi.chat_app.entities.Friend;
 import com.fmi.chat_app.entities.User;
 import com.fmi.chat_app.mappers.UserRowMapper;
 import com.fmi.chat_app.system.db.QueryBuilder;
@@ -83,6 +82,15 @@ public class UserRepository {
                         "WHEN f.user_id_2 = ? THEN f.user_id_1 END " +
                         "FROM td_friends f WHERE f.is_active = 1)", userId, userId)
                 .andWhere("u." + User.columns.IS_ACTIVE, 1)
+                .fetchAll(new UserRowMapper());
+    }
+
+    public List<User> fetchChannelMembers(int channelId) {
+        return db.select("u.*")
+                .from("tc_channel_members cm")
+                .join("td_users u", "cm.user_id = u.id")
+                .where("cm.channel_id", channelId)
+                .andWhere("cm.is_active", 1)
                 .fetchAll(new UserRowMapper());
     }
 

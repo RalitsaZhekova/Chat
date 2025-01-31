@@ -93,4 +93,12 @@ public class UserController {
         Map<String, Object> response = userService.getPaginatedUserFriends(id, page, rowsPerPage);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("users/of_channel/{channelId}")
+    public ResponseEntity<?> getChannelMembers(@PathVariable int channelId) {
+        List<User> members = userService.getChannelMembers(channelId);
+        return AppResponse.success()
+                .withData(members)
+                .build();
+    }
 }

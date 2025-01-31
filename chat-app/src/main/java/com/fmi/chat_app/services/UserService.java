@@ -66,4 +66,8 @@ public class UserService {
 
         return response;
     }
+
+    public List<User> getChannelMembers(int channelId) {
+        return userRepository.fetchChannelMembers(channelId);
+    }
 }
