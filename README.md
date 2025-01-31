@@ -1,3 +1,47 @@
+# Quick Start Guide
+
+This guide explains how to set up and run the project in a development environment.
+
+## Backend Setup (Spring Boot)
+
+1. **Install Prerequisites**
+   - Java 17+ installed
+
+2. **Run the Backend**
+   - Open the project in **IntelliJ IDEA**.
+   - Locate the file:  
+     ```
+     src/main/java/com/fmi/chat_app/ChatAppApplication.java
+     ```
+   - Right-click on `ChatAppApplication.java` and select **Run 'ChatAppApplication'**.
+   - The backend will run on `http://localhost:8081`.
+
+---
+
+## Frontend Setup (React + Vite)
+
+1. **Install Node.js**  
+   Download and install the LTS version of Node.js from [nodejs.org](https://nodejs.org/).
+
+2. **Set Up Frontend**
+   - Navigate to the frontend folder:
+     ```bash
+     cd ./chat-ui-react
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Start the development server:
+     ```bash
+     npm run dev
+     ```
+
+3. **Access the Application**
+   - Open your browser and navigate to `http://localhost:5173`.
+
+---
+
 # Курсов проект - ФИНАЛ  
 **Чатове матове**
 
